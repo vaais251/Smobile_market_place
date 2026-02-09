@@ -1,0 +1,24 @@
+# ──────────────────────────────────────────────
+# SMobile Backend — Python Dependencies
+# ──────────────────────────────────────────────
+
+# Web framework
+fastapi==0.115.6
+uvicorn[standard]==0.34.0
+
+# ORM & Database
+sqlmodel==0.0.22
+sqlalchemy==2.0.36
+psycopg2-binary==2.9.10
+
+# Migrations
+alembic==1.14.1
+
+# Configuration
+python-dotenv==1.0.1
+pydantic[email]==2.10.4
+
+# Security
+passlib[bcrypt]==1.7.4
+python-jose[cryptography]==3.3.0
+python-multipart==0.0.20

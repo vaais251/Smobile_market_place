@@ -2,10 +2,15 @@
 SMobile — API Router
 
 Central router that includes all versioned sub-routers.
-Extend this file as you add new route modules.
 """
 
 from fastapi import APIRouter
+
+from app.api.v1.endpoints.auth import router as auth_router
+from app.api.v1.endpoints.listings import router as listings_router
+from app.api.v1.endpoints.orders import router as orders_router
+from app.api.v1.endpoints.users import router as users_router
+from app.api.v1.endpoints.admin import router as admin_router
 
 api_router = APIRouter()
 
@@ -16,9 +21,9 @@ async def health_check():
     return {"status": "healthy", "service": "SMobile API"}
 
 
-# ── Future route includes ────────────────────
-# from app.api.routes import auth, users, listings, orders
-# api_router.include_router(auth.router, prefix="/auth", tags=["Auth"])
-# api_router.include_router(users.router, prefix="/users", tags=["Users"])
-# api_router.include_router(listings.router, prefix="/listings", tags=["Listings"])
-# api_router.include_router(orders.router, prefix="/orders", tags=["Orders"])
+# ── V1 Routers ───────────────────────────────
+api_router.include_router(auth_router, prefix="/auth", tags=["Auth"])
+api_router.include_router(listings_router, prefix="/listings", tags=["Listings"])
+api_router.include_router(orders_router, prefix="/orders", tags=["Orders"])
+api_router.include_router(users_router, prefix="/users", tags=["Users"])
+api_router.include_router(admin_router, prefix="/admin", tags=["Admin"])

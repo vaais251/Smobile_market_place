@@ -1,0 +1,138 @@
+@import "tailwindcss";
+
+/* ═══════════════════════════════════════════════
+   SMobile — Premium Design System
+   Uses Tailwind v4 CSS-first configuration.
+   Dark mode toggled via .dark class on <html>.
+   ═══════════════════════════════════════════════ */
+
+/* ── Light Mode (default) ─────────────────── */
+:root {
+  /* Backgrounds */
+  --background: #f8fafc;           /* Slate-50 */
+  --background-secondary: #f1f5f9; /* Slate-100 */
+  --background-card: #ffffff;
+
+  /* Foregrounds */
+  --foreground: #0f172a;           /* Slate-900 */
+  --foreground-secondary: #475569; /* Slate-500 */
+  --foreground-muted: #94a3b8;     /* Slate-400 */
+
+  /* Brand */
+  --primary: #6d28d9;              /* Violet-700 */
+  --primary-light: #8b5cf6;        /* Violet-500 */
+  --primary-dark: #5b21b6;         /* Violet-800 */
+  --primary-foreground: #ffffff;
+
+  /* Accent */
+  --accent: #0ea5e9;               /* Sky-500 */
+  --accent-foreground: #ffffff;
+
+  /* Semantic */
+  --success: #10b981;              /* Emerald-500 */
+  --warning: #f59e0b;              /* Amber-500 */
+  --danger: #ef4444;               /* Red-500 */
+
+  /* Borders & Rings */
+  --border: #e2e8f0;               /* Slate-200 */
+  --ring: #6d28d9;
+
+  /* Radius */
+  --radius: 0.75rem;
+}
+
+/* ── Dark Mode ────────────────────────────── */
+.dark {
+  /* Backgrounds — rich deep tones, NEVER pure black */
+  --background: #020617;           /* Slate-950 */
+  --background-secondary: #0f172a; /* Slate-900 */
+  --background-card: #1e293b;      /* Slate-800 */
+
+  /* Foregrounds */
+  --foreground: #f1f5f9;           /* Slate-100 */
+  --foreground-secondary: #94a3b8; /* Slate-400 */
+  --foreground-muted: #64748b;     /* Slate-500 */
+
+  /* Brand */
+  --primary: #8b5cf6;              /* Violet-500 */
+  --primary-light: #a78bfa;        /* Violet-400 */
+  --primary-dark: #7c3aed;         /* Violet-600 */
+  --primary-foreground: #ffffff;
+
+  /* Accent */
+  --accent: #38bdf8;               /* Sky-400 */
+  --accent-foreground: #020617;
+
+  /* Semantic */
+  --success: #34d399;              /* Emerald-400 */
+  --warning: #fbbf24;              /* Amber-400 */
+  --danger: #f87171;               /* Red-400 */
+
+  /* Borders — subtle, never harsh */
+  --border: #334155;               /* Slate-700 */
+  --ring: #8b5cf6;
+}
+
+/* ── Map CSS vars to Tailwind v4 theme ────── */
+@theme inline {
+  --color-background: var(--background);
+  --color-background-secondary: var(--background-secondary);
+  --color-background-card: var(--background-card);
+  --color-foreground: var(--foreground);
+  --color-foreground-secondary: var(--foreground-secondary);
+  --color-foreground-muted: var(--foreground-muted);
+  --color-primary: var(--primary);
+  --color-primary-light: var(--primary-light);
+  --color-primary-dark: var(--primary-dark);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-danger: var(--danger);
+  --color-border: var(--border);
+  --color-ring: var(--ring);
+  --radius-theme: var(--radius);
+  --font-sans: var(--font-inter);
+}
+
+/* ── Base Styles ─────────────────────────────── */
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-inter), system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ── Smooth transitions for theme switch ──── */
+*,
+*::before,
+*::after {
+  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.15s ease;
+}
+
+/* ── Scrollbar styling (Webkit) ──────────── */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--background-secondary);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--foreground-muted);
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--foreground-secondary);
+}
+
+/* ── Selection color ─────────────────────── */
+::selection {
+  background: var(--primary);
+  color: var(--primary-foreground);
+}

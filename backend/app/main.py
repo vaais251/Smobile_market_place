@@ -9,6 +9,7 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 from sqlmodel import SQLModel
 
 from app.core.config import settings
@@ -33,7 +34,7 @@ async def lifespan(app: FastAPI):
 # ── App Factory ──────────────────────────────
 app = FastAPI(
     title=settings.PROJECT_NAME,
-    version="0.2.0",
+    version="0.3.0",
     description="Enterprise-level API for the SMobile phone marketplace.",
     lifespan=lifespan,
 )
@@ -58,6 +59,14 @@ app.add_middleware(
 
 # ── Routers ──────────────────────────────────
 app.include_router(api_router, prefix=settings.API_V1_PREFIX)
+
+# ── Static files (uploaded images) ───────────
+import os
+from pathlib import Path
+
+STATIC_DIR = Path(__file__).resolve().parent.parent / "static"
+STATIC_DIR.mkdir(parents=True, exist_ok=True)
+app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
 
 
 # ── Root ─────────────────────────────────────

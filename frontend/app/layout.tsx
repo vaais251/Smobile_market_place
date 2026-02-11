@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import Providers from "@/components/Providers";
+import Navbar from "@/components/Navbar";
 import "./globals.css";
 
 const inter = Inter({
@@ -25,7 +26,7 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body className={`${inter.variable} font-sans antialiased`}>
         <Providers>
-          {/* Navbar will be inserted here */}
+          <Navbar />
           <main className="min-h-screen">{children}</main>
           {/* Footer will be inserted here */}
         </Providers>
@@ -33,3 +34,4 @@ export default function RootLayout({
     </html>
   );
 }
+

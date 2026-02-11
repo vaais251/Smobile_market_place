@@ -6,7 +6,7 @@ Separated from SQLModel table models to keep the API layer clean.
 """
 
 import re
-from typing import Optional, List
+from typing import Optional, List, Union
 
 from pydantic import BaseModel, EmailStr, field_validator, model_validator
 
@@ -222,9 +222,15 @@ class ListingUpdate(BaseModel):
         return v
 
 
+# ── Listing With Distance ───────────────────
+class ListingWithDistanceResponse(ListingResponse):
+    """ListingResponse extended with a calculated distance_km field."""
+    distance_km: float
+
+
 # ── Paginated Response ──────────────────────
 class PaginatedListingResponse(BaseModel):
-    items: List[ListingResponse]
+    items: List[Union[ListingWithDistanceResponse, ListingResponse]]
     total: int
     page: int
     per_page: int

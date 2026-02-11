@@ -3,7 +3,7 @@ SMobile — Listings Router
 
 Full CRUD for phone listings:
   POST   /              → Create (🔒 auth)
-  GET    /              → List all active listings (public, with filters)
+  GET    /              → List all active listings (public, with filters + geo sort)
   GET    /{id}          → Single listing detail (public)
   PUT    /{id}          → Update own listing (🔒 owner only)
   DELETE /{id}          → Soft-delete own listing (🔒 owner only)
@@ -14,6 +14,7 @@ from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlmodel import Session, select, func, col
+from sqlalchemy import literal_column, text
 
 from app.core.database import get_session
 from app.core.security import get_current_user
@@ -23,6 +24,7 @@ from app.schemas import (
     ListingCreate,
     ListingUpdate,
     ListingResponse,
+    ListingWithDistanceResponse,
     PaginatedListingResponse,
 )
 
@@ -116,13 +118,30 @@ def create_listing(
     return listing
 
 
+# ─────────────────────────────────────────────
+#  Haversine helper (Python fallback for distance calc)
+# ─────────────────────────────────────────────
+def _haversine(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
+    """Return distance in km between two lat/lng points."""
+    R = 6371.0  # Earth radius in km
+    dlat = math.radians(lat2 - lat1)
+    dlon = math.radians(lon2 - lon1)
+    a = (
+        math.sin(dlat / 2) ** 2
+        + math.cos(math.radians(lat1))
+        * math.cos(math.radians(lat2))
+        * math.sin(dlon / 2) ** 2
+    )
+    return R * 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
+
+
 # ═══════════════════════════════════════════════
-#  GET / — List with filters & pagination
+#  GET / — List with filters, search & geo-sort
 # ═══════════════════════════════════════════════
 @router.get(
     "/",
     response_model=PaginatedListingResponse,
-    summary="List active listings (public)",
+    summary="List active listings (public) with filters & nearby sort",
 )
 def list_listings(
     # Filters
@@ -130,8 +149,13 @@ def list_listings(
     type: Optional[PhoneType] = Query(None, description="Filter by NEW or OLD"),
     min_price: Optional[float] = Query(None, ge=0),
     max_price: Optional[float] = Query(None, ge=0),
+    ram: Optional[str] = Query(None, description="Filter by RAM, e.g. '8GB'"),
+    storage: Optional[str] = Query(None, description="Filter by storage, e.g. '128GB'"),
     city: Optional[str] = Query(None, description="Filter by seller city"),
     search: Optional[str] = Query(None, description="Search brand or model"),
+    # Geospatial
+    user_lat: Optional[float] = Query(None, description="User latitude for nearby sort"),
+    user_long: Optional[float] = Query(None, description="User longitude for nearby sort"),
     # Pagination
     page: int = Query(1, ge=1),
     per_page: int = Query(20, ge=1, le=100),
@@ -148,13 +172,16 @@ def list_listings(
         query = query.where(PhoneListing.price >= min_price)
     if max_price is not None:
         query = query.where(PhoneListing.price <= max_price)
+    if ram:
+        query = query.where(func.lower(PhoneListing.ram) == ram.lower())
+    if storage:
+        query = query.where(func.lower(PhoneListing.storage) == storage.lower())
     if search:
         pattern = f"%{search}%"
         query = query.where(
             col(PhoneListing.brand).ilike(pattern) | col(PhoneListing.model).ilike(pattern)
         )
     if city:
-        # Join to seller → seller_profile to filter by city
         query = (
             query
             .join(User, PhoneListing.seller_id == User.id)
@@ -166,17 +193,53 @@ def list_listings(
     count_query = select(func.count()).select_from(query.subquery())
     total = session.exec(count_query).one()
 
-    # ── Paginate ─────────────────────────────
+    # ── Order ────────────────────────────────
     offset = (page - 1) * per_page
-    items = session.exec(
-        query.order_by(PhoneListing.created_at.desc()).offset(offset).limit(per_page)
-    ).all()
 
+    if user_lat is not None and user_long is not None:
+        # Use SQL-level Haversine for distance-based ordering
+        # This works on any PostgreSQL without PostGIS
+        haversine_expr = (
+            6371.0
+            * func.acos(
+                func.least(
+                    literal_column("1.0"),
+                    func.cos(func.radians(user_lat))
+                    * func.cos(func.radians(PhoneListing.location_lat))
+                    * func.cos(
+                        func.radians(PhoneListing.location_long)
+                        - func.radians(user_long)
+                    )
+                    + func.sin(func.radians(user_lat))
+                    * func.sin(func.radians(PhoneListing.location_lat)),
+                )
+            )
+        )
+        query = query.order_by(haversine_expr.asc())
+    else:
+        query = query.order_by(PhoneListing.created_at.desc())
+
+    items = session.exec(query.offset(offset).limit(per_page)).all()
+
+    # ── Build response (add distance_km if geo provided) ──
+    response_items = []
     for item in items:
         _load_details(item)
+        if user_lat is not None and user_long is not None:
+            dist = round(
+                _haversine(user_lat, user_long, item.location_lat, item.location_long), 1
+            )
+            response_items.append(
+                ListingWithDistanceResponse(
+                    **ListingResponse.model_validate(item).model_dump(),
+                    distance_km=dist,
+                )
+            )
+        else:
+            response_items.append(ListingResponse.model_validate(item))
 
     return PaginatedListingResponse(
-        items=items,
+        items=response_items,
         total=total,
         page=page,
         per_page=per_page,

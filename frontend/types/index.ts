@@ -69,8 +69,11 @@ export interface PhoneListing {
     location_lat: number;
     location_long: number;
     is_active: boolean;
+    created_at?: string;
     old_phone_details?: OldPhoneDetails | null;
     new_phone_details?: NewPhoneDetails | null;
+    /** Calculated field — only present when user_lat/user_long provided */
+    distance_km?: number | null;
 }
 
 export interface PaginatedListings {
@@ -79,6 +82,22 @@ export interface PaginatedListings {
     page: number;
     per_page: number;
     pages: number;
+}
+
+// ── Filters ─────────────────────────────────
+export interface ListingFilters {
+    search?: string;
+    brand?: string;
+    type?: PhoneType;
+    min_price?: number;
+    max_price?: number;
+    ram?: string;
+    storage?: string;
+    city?: string;
+    user_lat?: number;
+    user_long?: number;
+    page?: number;
+    per_page?: number;
 }
 
 // ── Orders ──────────────────────────────────

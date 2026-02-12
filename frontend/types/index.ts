@@ -101,7 +101,7 @@ export interface ListingFilters {
 }
 
 // ── Orders ──────────────────────────────────
-export type OrderStatus = "PENDING" | "COMPLETED" | "CANCELLED";
+export type OrderStatus = "PENDING" | "SHIPPED" | "COMPLETED" | "CANCELLED";
 
 export interface Order {
     id: number;
@@ -109,5 +109,47 @@ export interface Order {
     listing_id: number;
     seller_id: number;
     status: OrderStatus;
+    buyer_address?: string | null;
+    buyer_chat_room_id?: number | null;
+    seller_chat_room_id?: number | null;
     created_at: string;
+    // Enriched fields
+    buyer_name?: string | null;
+    seller_name?: string | null;
+    listing_title?: string | null;
+    listing_image?: string | null;
+    listing_price?: number | null;
+}
+
+// ── Chat ────────────────────────────────────
+export interface ChatMessage {
+    id: number;
+    room_id: number;
+    sender_id: number;
+    sender_name: string;
+    sender_role: UserRole;
+    content: string;
+    timestamp: string;
+    read_at: string | null;
+}
+
+export interface ChatParticipant {
+    id: number;
+    name: string;
+    role: UserRole;
+}
+
+export interface ChatRoom {
+    id: number;
+    name: string;
+    order_id: number | null;
+    is_active: boolean;
+    created_at: string;
+    participants: ChatParticipant[];
+    last_message: {
+        content: string;
+        sender_id: number;
+        timestamp: string;
+    } | null;
+    unread_count: number;
 }

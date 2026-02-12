@@ -15,6 +15,8 @@ import {
 
 import Button from "@/components/ui/Button";
 import ListingCard from "@/components/listings/ListingCard";
+import ListingSkeleton from "@/components/ui/ListingSkeleton";
+import EmptyState from "@/components/ui/EmptyState";
 import { useListings } from "@/hooks/useListings";
 import { cn } from "@/lib/utils";
 import type { ListingFilters, PhoneType } from "@/types";
@@ -329,11 +331,12 @@ export default function MarketplacePage() {
           </p>
         )}
 
-        {/* Loading state */}
+        {/* Loading skeleton grid */}
         {isLoading && (
-          <div className="flex flex-col items-center justify-center py-24 gap-4">
-            <Loader2 className="h-8 w-8 animate-spin text-primary" />
-            <p className="text-sm text-foreground-secondary">Loading listings...</p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
+            {Array.from({ length: 8 }).map((_, i) => (
+              <ListingSkeleton key={i} />
+            ))}
           </div>
         )}
 
@@ -348,30 +351,27 @@ export default function MarketplacePage() {
 
         {/* Empty state */}
         {!isLoading && !error && listings.length === 0 && (
-          <div className="flex flex-col items-center justify-center py-24 gap-6 text-center">
-            <div className="flex h-24 w-24 items-center justify-center rounded-3xl bg-primary/10">
-              <Smartphone className="h-12 w-12 text-primary opacity-50" />
-            </div>
-            <div>
-              <h3 className="text-lg font-semibold text-foreground">
-                No phones found
-              </h3>
-              <p className="mt-1 text-sm text-foreground-secondary max-w-sm mx-auto">
-                Try adjusting your search or filters to find what you&apos;re looking for.
-              </p>
-            </div>
-            <Button variant="outline" onClick={clearFilters}>
-              Clear Filters
-            </Button>
-          </div>
+          <EmptyState
+            title="No phones found"
+            message="Try adjusting your search or filters to find what you're looking for."
+            actionLabel="Clear Filters"
+            onAction={clearFilters}
+          />
         )}
 
         {/* Listings grid */}
         {!isLoading && !error && listings.length > 0 && (
           <>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
-              {listings.map((listing) => (
-                <ListingCard key={listing.id} listing={listing} />
+              {listings.map((listing, i) => (
+                <motion.div
+                  key={listing.id}
+                  initial={{ opacity: 0, y: 16 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.35, delay: i * 0.04 }}
+                >
+                  <ListingCard listing={listing} />
+                </motion.div>
               ))}
             </div>
 

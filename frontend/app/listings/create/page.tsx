@@ -22,6 +22,7 @@ import {
     X,
     CheckCircle,
 } from "lucide-react";
+import { toast } from "sonner";
 
 import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
@@ -219,11 +220,12 @@ export default function CreateListingPage() {
             }
 
             const res = await api.post("/listings", payload);
+            toast.success("Listing created!", { description: "Your phone is now live on the marketplace." });
             router.push(`/listings/${res.data.id}`);
         } catch (err: any) {
-            setApiError(
-                err.response?.data?.detail || "Failed to create listing. Please try again."
-            );
+            const msg = err.response?.data?.detail || "Failed to create listing. Please try again.";
+            setApiError(msg);
+            toast.error("Listing failed", { description: msg });
         } finally {
             setIsSubmitting(false);
         }

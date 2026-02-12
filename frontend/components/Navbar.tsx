@@ -4,11 +4,13 @@
  * SMobile — Navbar
  *
  * Top navigation bar with logo, links, auth buttons, and sell CTA.
+ * Shows "Admin Dashboard" for admins and "My Orders" for logged-in users.
  */
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
+import { AnimatePresence, motion } from "framer-motion";
 import {
     Smartphone,
     Plus,
@@ -16,6 +18,8 @@ import {
     LogOut,
     Menu,
     X,
+    ShoppingBag,
+    LayoutDashboard,
 } from "lucide-react";
 
 import Button from "@/components/ui/Button";
@@ -45,6 +49,8 @@ export default function Navbar() {
     const isAuthPage = pathname.startsWith("/login") || pathname.startsWith("/register");
     if (isAuthPage) return null;
 
+    const isAdmin = user?.role === "ADMIN";
+
     return (
         <header
             className={cn(
@@ -69,6 +75,36 @@ export default function Navbar() {
                 <nav className="hidden md:flex items-center gap-2">
                     {isAuthenticated ? (
                         <>
+                            {/* Admin Dashboard */}
+                            {isAdmin && (
+                                <Link
+                                    href="/admin"
+                                    className={cn(
+                                        "flex items-center gap-1.5 rounded-xl px-3 py-2 text-sm font-medium transition-all",
+                                        pathname === "/admin"
+                                            ? "text-primary bg-primary/10"
+                                            : "text-foreground-secondary hover:text-foreground hover:bg-background-secondary"
+                                    )}
+                                >
+                                    <LayoutDashboard className="h-4 w-4" />
+                                    Dashboard
+                                </Link>
+                            )}
+
+                            {/* My Orders */}
+                            <Link
+                                href="/orders"
+                                className={cn(
+                                    "flex items-center gap-1.5 rounded-xl px-3 py-2 text-sm font-medium transition-all",
+                                    pathname === "/orders"
+                                        ? "text-primary bg-primary/10"
+                                        : "text-foreground-secondary hover:text-foreground hover:bg-background-secondary"
+                                )}
+                            >
+                                <ShoppingBag className="h-4 w-4" />
+                                My Orders
+                            </Link>
+
                             {/* Sell CTA */}
                             <Link href="/listings/create">
                                 <Button size="sm" className="gap-1.5">
@@ -119,59 +155,91 @@ export default function Navbar() {
                 </button>
             </div>
 
-            {/* ── Mobile menu ────────────────────── */}
-            {mobileOpen && (
-                <div className="md:hidden border-t border-border bg-background px-4 py-4 space-y-2">
-                    {isAuthenticated ? (
-                        <>
-                            <Link
-                                href="/listings/create"
-                                onClick={() => setMobileOpen(false)}
-                                className="flex items-center gap-2 rounded-xl px-3 py-2.5 text-sm font-medium text-foreground hover:bg-primary/10 hover:text-primary transition-all"
-                            >
-                                <Plus className="h-4 w-4" />
-                                Sell Phone
-                            </Link>
-                            <Link
-                                href="/profile"
-                                onClick={() => setMobileOpen(false)}
-                                className="flex items-center gap-2 rounded-xl px-3 py-2.5 text-sm text-foreground-secondary hover:bg-background-secondary transition-all"
-                            >
-                                <User className="h-4 w-4" />
-                                {user?.name}
-                            </Link>
-                            <button
-                                onClick={() => {
-                                    handleLogout();
-                                    setMobileOpen(false);
-                                }}
-                                className="flex w-full items-center gap-2 rounded-xl px-3 py-2.5 text-sm text-danger hover:bg-danger/10 transition-all cursor-pointer"
-                            >
-                                <LogOut className="h-4 w-4" />
-                                Logout
-                            </button>
-                        </>
-                    ) : (
-                        <>
-                            <Link
-                                href="/login"
-                                onClick={() => setMobileOpen(false)}
-                                className="block rounded-xl px-3 py-2.5 text-sm font-medium text-foreground-secondary hover:bg-background-secondary transition-all text-center"
-                            >
-                                Sign In
-                            </Link>
-                            <Link
-                                href="/register"
-                                onClick={() => setMobileOpen(false)}
-                            >
-                                <Button className="w-full" size="sm">
-                                    Get Started
-                                </Button>
-                            </Link>
-                        </>
-                    )}
-                </div>
-            )}
+            {/* ── Mobile menu (animated slide-down) ─── */}
+            <AnimatePresence>
+                {mobileOpen && (
+                    <motion.div
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: "auto" }}
+                        exit={{ opacity: 0, height: 0 }}
+                        transition={{ duration: 0.25, ease: [0.4, 0, 0.2, 1] }}
+                        className="md:hidden overflow-hidden border-t border-border bg-background/95 backdrop-blur-lg"
+                    >
+                        <div className="px-4 py-4 space-y-2">
+                            {isAuthenticated ? (
+                                <>
+                                    {/* Admin Dashboard (mobile) */}
+                                    {isAdmin && (
+                                        <Link
+                                            href="/admin"
+                                            onClick={() => setMobileOpen(false)}
+                                            className="flex items-center gap-2 rounded-xl px-3 py-2.5 text-sm font-medium text-foreground hover:bg-primary/10 hover:text-primary transition-all"
+                                        >
+                                            <LayoutDashboard className="h-4 w-4" />
+                                            Admin Dashboard
+                                        </Link>
+                                    )}
+
+                                    {/* My Orders (mobile) */}
+                                    <Link
+                                        href="/orders"
+                                        onClick={() => setMobileOpen(false)}
+                                        className="flex items-center gap-2 rounded-xl px-3 py-2.5 text-sm font-medium text-foreground hover:bg-primary/10 hover:text-primary transition-all"
+                                    >
+                                        <ShoppingBag className="h-4 w-4" />
+                                        My Orders
+                                    </Link>
+
+                                    <Link
+                                        href="/listings/create"
+                                        onClick={() => setMobileOpen(false)}
+                                        className="flex items-center gap-2 rounded-xl px-3 py-2.5 text-sm font-medium text-foreground hover:bg-primary/10 hover:text-primary transition-all"
+                                    >
+                                        <Plus className="h-4 w-4" />
+                                        Sell Phone
+                                    </Link>
+                                    <Link
+                                        href="/profile"
+                                        onClick={() => setMobileOpen(false)}
+                                        className="flex items-center gap-2 rounded-xl px-3 py-2.5 text-sm text-foreground-secondary hover:bg-background-secondary transition-all"
+                                    >
+                                        <User className="h-4 w-4" />
+                                        {user?.name}
+                                    </Link>
+                                    <button
+                                        onClick={() => {
+                                            handleLogout();
+                                            setMobileOpen(false);
+                                        }}
+                                        className="flex w-full items-center gap-2 rounded-xl px-3 py-2.5 text-sm text-danger hover:bg-danger/10 transition-all cursor-pointer"
+                                    >
+                                        <LogOut className="h-4 w-4" />
+                                        Logout
+                                    </button>
+                                </>
+                            ) : (
+                                <>
+                                    <Link
+                                        href="/login"
+                                        onClick={() => setMobileOpen(false)}
+                                        className="block rounded-xl px-3 py-2.5 text-sm font-medium text-foreground-secondary hover:bg-background-secondary transition-all text-center"
+                                    >
+                                        Sign In
+                                    </Link>
+                                    <Link
+                                        href="/register"
+                                        onClick={() => setMobileOpen(false)}
+                                    >
+                                        <Button className="w-full" size="sm">
+                                            Get Started
+                                        </Button>
+                                    </Link>
+                                </>
+                            )}
+                        </div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
         </header>
     );
 }

@@ -1,5 +1,8 @@
 """
 SMobile — Order Model
+
+Tracks purchases between buyers and sellers.
+Includes references to auto-created chat rooms for support.
 """
 
 import enum
@@ -16,6 +19,7 @@ if TYPE_CHECKING:
 # ── Enums ────────────────────────────────────
 class OrderStatus(str, enum.Enum):
     PENDING = "PENDING"
+    SHIPPED = "SHIPPED"
     COMPLETED = "COMPLETED"
     CANCELLED = "CANCELLED"
 
@@ -31,6 +35,12 @@ class Order(SQLModel, table=True):
     status: OrderStatus = Field(
         sa_column=Column(SAEnum(OrderStatus), nullable=False, default=OrderStatus.PENDING)
     )
+    buyer_address: Optional[str] = Field(default=None, max_length=500)
+
+    # Chat room references (auto-created on order placement)
+    buyer_chat_room_id: Optional[int] = Field(default=None, foreign_key="chat_rooms.id")
+    seller_chat_room_id: Optional[int] = Field(default=None, foreign_key="chat_rooms.id")
+
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
     # ── Relationships ────────────────────────

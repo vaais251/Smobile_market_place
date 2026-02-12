@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import Providers from "@/components/Providers";
 import Navbar from "@/components/Navbar";
+import ToastProvider from "@/components/ui/ToastProvider";
 import "./globals.css";
 
 const inter = Inter({
@@ -28,6 +29,7 @@ export default function RootLayout({
         <Providers>
           <Navbar />
           <main className="min-h-screen">{children}</main>
+          <ToastProvider />
           {/* Footer will be inserted here */}
         </Providers>
       </body>

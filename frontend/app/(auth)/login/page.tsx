@@ -8,6 +8,7 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { motion } from "framer-motion";
 import { Phone, Lock, Smartphone } from "lucide-react";
+import { toast } from "sonner";
 
 import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
@@ -63,12 +64,15 @@ export default function LoginPage() {
             });
 
             login(userRes.data, access_token);
+            toast.success("Welcome back!", { description: "You've been signed in successfully." });
             router.push("/");
         } catch (err: any) {
             if (err.response?.status === 401) {
                 setApiError("Invalid phone number or password.");
+                toast.error("Login failed", { description: "Invalid phone number or password." });
             } else {
                 setApiError("Something went wrong. Please try again.");
+                toast.error("Login failed", { description: "Something went wrong. Please try again." });
             }
         } finally {
             setIsLoading(false);

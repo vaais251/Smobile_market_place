@@ -12,6 +12,7 @@ from app.api.v1.endpoints.orders import router as orders_router
 from app.api.v1.endpoints.users import router as users_router
 from app.api.v1.endpoints.admin import router as admin_router
 from app.api.v1.endpoints.media import router as media_router
+from app.api.v1.endpoints.chat import router as chat_router
 
 api_router = APIRouter()
 
@@ -29,3 +30,4 @@ api_router.include_router(orders_router, prefix="/orders", tags=["Orders"])
 api_router.include_router(users_router, prefix="/users", tags=["Users"])
 api_router.include_router(admin_router, prefix="/admin", tags=["Admin"])
 api_router.include_router(media_router, prefix="/media", tags=["Media"])
+api_router.include_router(chat_router, prefix="/chat", tags=["Chat"])

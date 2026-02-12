@@ -246,6 +246,7 @@ from app.models.order import OrderStatus
 class OrderCreate(BaseModel):
     """Payload for POST /orders — buyer places an order."""
     listing_id: int
+    buyer_address: Optional[str] = None
 
 
 class OrderResponse(BaseModel):
@@ -254,7 +255,17 @@ class OrderResponse(BaseModel):
     listing_id: int
     seller_id: int
     status: OrderStatus
+    buyer_address: Optional[str] = None
+    buyer_chat_room_id: Optional[int] = None
+    seller_chat_room_id: Optional[int] = None
     created_at: str  # serialised datetime
+
+    # Enriched fields (populated by the endpoint, not the ORM directly)
+    buyer_name: Optional[str] = None
+    seller_name: Optional[str] = None
+    listing_title: Optional[str] = None
+    listing_image: Optional[str] = None
+    listing_price: Optional[float] = None
 
     model_config = {"from_attributes": True}
 

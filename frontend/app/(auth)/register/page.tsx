@@ -18,6 +18,7 @@ import {
     Loader2,
     Smartphone,
 } from "lucide-react";
+import { toast } from "sonner";
 
 import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
@@ -178,13 +179,16 @@ export default function RegisterPage() {
             });
 
             login(userRes.data, access_token);
+            toast.success("Account created!", { description: "Welcome to SMobile marketplace." });
             router.push("/");
         } catch (err: any) {
             const detail = err.response?.data?.detail;
             if (typeof detail === "string") {
                 setApiError(detail);
+                toast.error("Registration failed", { description: detail });
             } else {
                 setApiError("Registration failed. Please check your inputs.");
+                toast.error("Registration failed", { description: "Please check your inputs and try again." });
             }
         } finally {
             setIsLoading(false);

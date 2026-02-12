@@ -15,7 +15,7 @@ class Settings(BaseSettings):
     POSTGRES_USER: str = "smobile_user"
     POSTGRES_PASSWORD: str = "smobile_dev_pass_2026"
     POSTGRES_DB: str = "smobile_db"
-    DATABASE_URL: str = "postgresql://smobile_user:smobile_dev_pass_2026@db:5432/smobile_db"
+    DATABASE_URL: str = "postgresql://smobile_user:smobile_dev_pass_2026@localhost:5432/smobile_db"
 
     # ── Application ──────────────────────────
     SECRET_KEY: str = "dev-secret-key-change-in-production"

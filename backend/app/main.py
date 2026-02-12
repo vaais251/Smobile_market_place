@@ -20,6 +20,7 @@ from app.api import api_router
 from app.models.user import User, SellerProfile          # noqa: F401
 from app.models.listing import PhoneListing, OldPhoneDetails, NewPhoneDetails  # noqa: F401
 from app.models.order import Order                       # noqa: F401
+from app.models.chat import ChatRoom, ChatParticipant, Message  # noqa: F401
 
 
 # ── Lifespan ─────────────────────────────────
@@ -34,7 +35,7 @@ async def lifespan(app: FastAPI):
 # ── App Factory ──────────────────────────────
 app = FastAPI(
     title=settings.PROJECT_NAME,
-    version="0.3.0",
+    version="0.4.0",
     description="Enterprise-level API for the SMobile phone marketplace.",
     lifespan=lifespan,
 )

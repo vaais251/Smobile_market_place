@@ -77,15 +77,6 @@ const baseSchema = z
             return true;
         },
         { message: "City is required for sellers", path: ["city"] }
-    )
-    .refine(
-        (d) => {
-            if (d.role === "SELLER") {
-                return d.latitude != null && d.longitude != null;
-            }
-            return true;
-        },
-        { message: "Location is required — use the detect button", path: ["latitude"] }
     );
 
 type RegisterForm = z.infer<typeof baseSchema>;
@@ -165,27 +156,39 @@ export default function RegisterPage() {
             await api.post("/auth/register", payload);
 
             // Auto-login after successful registration
-            const formData = new URLSearchParams();
-            formData.append("username", data.phone);
-            formData.append("password", data.password);
+            try {
+                const formData = new URLSearchParams();
+                formData.append("username", data.phone);
+                formData.append("password", data.password);
 
-            const loginRes = await api.post("/auth/login", formData, {
-                headers: { "Content-Type": "application/x-www-form-urlencoded" },
-            });
+                const loginRes = await api.post("/auth/login", formData, {
+                    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                });
 
-            const { access_token } = loginRes.data;
-            const userRes = await api.get("/users/me", {
-                headers: { Authorization: `Bearer ${access_token}` },
-            });
+                const { access_token } = loginRes.data;
+                const userRes = await api.get("/users/me", {
+                    headers: { Authorization: `Bearer ${access_token}` },
+                });
 
-            login(userRes.data, access_token);
-            toast.success("Account created!", { description: "Welcome to SMobile marketplace." });
-            router.push("/");
+                login(userRes.data, access_token);
+                toast.success("Account created!", { description: "Welcome to SMobile marketplace." });
+                router.push("/");
+            } catch {
+                // Registration succeeded but auto-login failed — redirect to login page
+                toast.success("Account created!", {
+                    description: "Please sign in with your new credentials.",
+                });
+                router.push("/login");
+            }
         } catch (err: any) {
             const detail = err.response?.data?.detail;
             if (typeof detail === "string") {
                 setApiError(detail);
                 toast.error("Registration failed", { description: detail });
+            } else if (err.request && !err.response) {
+                // Network error — backend is unreachable
+                setApiError("Cannot connect to the server. Please make sure the backend is running.");
+                toast.error("Connection error", { description: "Cannot reach the server." });
             } else {
                 setApiError("Registration failed. Please check your inputs.");
                 toast.error("Registration failed", { description: "Please check your inputs and try again." });
@@ -338,7 +341,7 @@ export default function RegisterPage() {
                                         {/* Location Detection */}
                                         <div>
                                             <label className="block text-sm font-medium text-foreground-secondary mb-2">
-                                                Location
+                                                Location <span className="text-foreground-muted font-normal">(Optional)</span>
                                             </label>
                                             <button
                                                 type="button"

@@ -55,8 +55,8 @@ class SellerProfile(SQLModel, table=True):
     user_id: int = Field(foreign_key="users.id", unique=True, index=True)
     address: str = Field(max_length=500)
     city: str = Field(max_length=100)
-    latitude: float
-    longitude: float
+    latitude: Optional[float] = Field(default=None)
+    longitude: Optional[float] = Field(default=None)
     is_shop: bool = Field(default=False)
     shop_name: Optional[str] = Field(default=None, max_length=200)
 

@@ -23,8 +23,8 @@ class SellerProfileCreate(BaseModel):
     """Optional seller location data provided during registration."""
     address: str
     city: str
-    latitude: float
-    longitude: float
+    latitude: Optional[float] = None
+    longitude: Optional[float] = None
     is_shop: bool = False
     shop_name: Optional[str] = None
 
@@ -283,8 +283,8 @@ class SellerProfileResponse(BaseModel):
     id: int
     address: str
     city: str
-    latitude: float
-    longitude: float
+    latitude: Optional[float] = None
+    longitude: Optional[float] = None
     is_shop: bool
     shop_name: Optional[str] = None
 

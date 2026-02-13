@@ -39,12 +39,22 @@ api.interceptors.response.use(
     (response) => response,
     (error) => {
         if (error.response?.status === 401 && typeof window !== "undefined") {
-            // Clear stale auth data
-            localStorage.removeItem("smobile_token");
-            localStorage.removeItem("smobile_user");
+            const pathname = window.location.pathname;
+            const requestUrl = error.config?.url || "";
 
-            // Redirect to login (avoid redirect loop if already on /login)
-            if (!window.location.pathname.startsWith("/login")) {
+            // Don't intercept 401s on auth pages or for auth-related API calls.
+            // This lets the register/login pages handle their own errors.
+            const isOnAuthPage =
+                pathname.startsWith("/login") ||
+                pathname.startsWith("/register");
+            const isAuthRequest =
+                requestUrl.includes("/auth/login") ||
+                requestUrl.includes("/auth/register");
+
+            if (!isOnAuthPage && !isAuthRequest) {
+                // Clear stale auth data
+                localStorage.removeItem("smobile_token");
+                localStorage.removeItem("smobile_user");
                 window.location.href = "/login";
             }
         }

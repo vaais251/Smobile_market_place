@@ -69,6 +69,14 @@ def seed():
             role=UserRole.SELLER,
         )
 
+        seller4 = User(
+            name="Gadget Future",
+            phone="+923007777777",
+            email="gadget.future@email.com",
+            hashed_password=hash_password("Seller@123"),
+            role=UserRole.SELLER,
+        )
+
         buyer1 = User(
             name="Ahmed Raza",
             phone="+923005555555",
@@ -85,9 +93,9 @@ def seed():
             role=UserRole.BUYER,
         )
 
-        session.add_all([admin, seller1, seller2, seller3, buyer1, buyer2])
+        session.add_all([admin, seller1, seller2, seller3, seller4, buyer1, buyer2])
         session.flush()
-        print(f"   ✅ Created {6} users (1 admin, 3 sellers, 2 buyers)")
+        print(f"   ✅ Created {7} users (1 admin, 4 sellers, 2 buyers)")
 
         # ════════════════════════════════════════
         # 2. SELLER PROFILES
@@ -120,6 +128,15 @@ def seed():
                 is_shop=True,
                 shop_name="Hassan Mobile Zone",
             ),
+            SellerProfile(
+                user_id=seller4.id,
+                address="Shop 88, Hafeez Center",
+                city="Lahore",
+                latitude=31.5039,
+                longitude=74.3415,
+                is_shop=True,
+                shop_name="Gadget Future",
+            ),
         ]
         session.add_all(profiles)
         session.flush()
@@ -143,6 +160,10 @@ def seed():
             "oppo_reno":      "https://images.unsplash.com/photo-1574944985070-8f3ebc6b79d2?w=800&q=80",
             "realme_gt":      "https://images.unsplash.com/photo-1605236453806-6ff36851218e?w=800&q=80",
             "infinix_note":   "https://images.unsplash.com/photo-1592899677977-9c10ca588bbd?w=800&q=80",
+            "nothing_phone":  "https://images.unsplash.com/photo-1691426462947-8aed7f42c2c5?w=800&q=80",
+            "pixel_9":        "https://images.unsplash.com/photo-1696614488390-e88df2cb0b89?w=800&q=80",
+            "sony_xperia":    "https://images.unsplash.com/photo-1601784551446-20c9e07cdbdb?w=800&q=80",
+            "asus_rog":       "https://images.unsplash.com/photo-1626245084931-e1fcc13251e6?w=800&q=80",
         }
 
         listings_data = [
@@ -225,6 +246,38 @@ def seed():
                 "new_phone": {
                     "processor": "Snapdragon 8 Gen 3",
                     "battery_mah": 4880,
+                },
+            },
+            {
+                "seller_id": seller4.id,
+                "type": PhoneType.NEW,
+                "brand": "Nothing",
+                "model": "Phone (2)",
+                "price": 129999,
+                "ram": "12GB",
+                "storage": "256GB",
+                "main_image_url": IMG["nothing_phone"],
+                "location_lat": 31.5039,
+                "location_long": 74.3415,
+                "new_phone": {
+                    "processor": "Snapdragon 8+ Gen 1",
+                    "battery_mah": 4700,
+                },
+            },
+            {
+                "seller_id": seller4.id,
+                "type": PhoneType.NEW,
+                "brand": "Google",
+                "model": "Pixel 9 Pro",
+                "price": 209999,
+                "ram": "16GB",
+                "storage": "512GB",
+                "main_image_url": IMG["pixel_9"],
+                "location_lat": 31.5039,
+                "location_long": 74.3415,
+                "new_phone": {
+                    "processor": "Google Tensor G4",
+                    "battery_mah": 5000,
                 },
             },
 
@@ -369,6 +422,46 @@ def seed():
                     "defect_details": "Screen protector has bubbles, screen itself is perfect",
                 },
             },
+            {
+                "seller_id": seller4.id,
+                "type": PhoneType.OLD,
+                "brand": "Sony",
+                "model": "Xperia 1 V",
+                "price": 99999,
+                "ram": "12GB",
+                "storage": "256GB",
+                "main_image_url": IMG["sony_xperia"],
+                "location_lat": 31.5039,
+                "location_long": 74.3415,
+                "old_phone": {
+                    "battery_health": 90,
+                    "battery_mah": 5000,
+                    "pta_approved": True,
+                    "accessories": "Box and charger",
+                    "condition_rating": 9,
+                    "defect_details": None,
+                },
+            },
+            {
+                "seller_id": seller4.id,
+                "type": PhoneType.OLD,
+                "brand": "Asus",
+                "model": "ROG Phone 8",
+                "price": 159999,
+                "ram": "16GB",
+                "storage": "512GB",
+                "main_image_url": IMG["asus_rog"],
+                "location_lat": 31.5039,
+                "location_long": 74.3415,
+                "old_phone": {
+                    "battery_health": 95,
+                    "battery_mah": 5500,
+                    "pta_approved": True,
+                    "accessories": "Full gaming kit",
+                    "condition_rating": 9,
+                    "defect_details": None,
+                },
+            },
         ]
 
         for data in listings_data:
@@ -408,6 +501,7 @@ def seed():
         print("     Ali Khan:           +923002222222 / Seller@123")
         print("     Fatima Noor:        +923003333333 / Seller@123")
         print("     Hassan Mobile Zone: +923004444444 / Seller@123")
+        print("     Gadget Future:      +923007777777 / Seller@123")
         print()
         print("  🛒 BUYERS")
         print("     Ahmed Raza:  +923005555555 / Buyer@123")
